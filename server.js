@@ -212,7 +212,7 @@ async.series([
         };
         initializeDB(d.db);
         var serverURI = 'http://' + options.eventserver + ':' + d.port;
-        log.verbose(d.name, "Connecting to server at: " + serverURI);
+        log.info(d.name, "Connecting to server at: " + serverURI);
         d.socket = require('socket.io-client')(serverURI);
         d.socket.on('connect', function() {
           log.verbose(d.name,"[EVENT] connect");
