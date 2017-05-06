@@ -110,8 +110,7 @@ var demozones = undefined;
 const PORT    = 10100;
 const URI     = "/";
 const DBURI   = '/apex/pdb1/anki/demozone/zone/'
-const STATUS       = '/status/:demozone';
-const STATUSBYCAR  = '/status/:demozone/:carname';
+const STATUS  = '/status/:demozone/:carname';
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(URI, router);
@@ -321,6 +320,7 @@ async.series([
       });
     },
     function(next) {
+      /**
       router.get(STATUS, function(req, res) {
         log.verbose("", "Status request");
         var demozone = req.params.demozone;
@@ -341,10 +341,11 @@ async.series([
           res.status(200).send(data);
         }
       });
-      router.get(STATUSBYCAR, function(req, res) {
-        log.verbose("", "Status request");
+      **/
+      router.get(STATUS, function(req, res) {
         var demozone = req.params.demozone;
         var carname  = req.params.carname;
+        log.verbose("", "Status request (%s, %s)", demozone, carname);
         var client = _.find(clients, { 'demozone': demozone });
         if ( !client) {
           res.status(404).send();
