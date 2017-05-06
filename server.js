@@ -110,7 +110,7 @@ var demozones = undefined;
 const PORT    = 10100;
 const URI     = "/";
 const DBURI   = '/apex/pdb1/anki/demozone/zone/'
-const STATUS  = '/status/:demozone/:carname';
+const STATUS  = '/status/:demozone/:carname?';
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(URI, router);
