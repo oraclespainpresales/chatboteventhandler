@@ -179,6 +179,7 @@ function getRaceId(db, carname) {
     filter = util.format(" WHERE CAR = '%s'", carname);
   }
   var sql = "SELECT DISTINCT RACE FROM SPEED" + filter;
+  log.verbose("", "SQL statement to be executed: '%s'", sql);
   return db.exec(sql);
 }
 
@@ -188,6 +189,7 @@ function getSpeedData(db, carname) {
     filter = util.format(" WHERE CAR = '%s'", carname);
   }
   var sql = "SELECT CAR, MAX(SPEED) AS MAXSPEED, MIN(SPEED) AS MINSPEED, AVG(SPEED) AS AVGSPEED FROM SPEED " + filter + " GROUP BY CAR";
+  log.verbose("", "SQL statement to be executed: '%s'", sql);
   return db.exec(sql);
 }
 
@@ -197,6 +199,7 @@ function getLapData(db, carname) {
     filter = util.format(" WHERE CAR = '%s'", carname);
   }
   var sql = "SELECT CAR, MIN(LAPTIME) AS FASTESTTIME FROM LAP " + filter + " GROUP BY CAR";
+  log.verbose("", "SQL statement to be executed: '%s'", sql);
   return db.exec(sql);
 }
 
@@ -206,6 +209,7 @@ function getOfftrackData(db, carname) {
     filter = util.format(" WHERE CAR = '%s'", carname);
   }
   var sql = "SELECT TIMESTAMP,CAR,LAP,TRACK FROM OFFTRACK " + filter + " ORDER BY TIMESTAMP,LAP,CAR";
+  log.verbose("", "SQL statement to be executed: '%s'", sql);
   return db.exec(sql);
 }
 
