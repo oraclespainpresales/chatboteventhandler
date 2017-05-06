@@ -110,7 +110,8 @@ var demozones = undefined;
 const PORT    = 10100;
 const URI     = "/";
 const DBURI   = '/apex/pdb1/anki/demozone/zone/'
-const STATUS  = '/status/:demozone';
+const STATUS       = '/status/:demozone';
+const STATUSBYCAR  = '/status/:demozone/:carname';
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(URI, router);
@@ -173,18 +174,39 @@ function insertDataDB(db, table, data) {
   db.exec(sql);
 }
 
-function getSpeedData(db) {
-  var sql = "SELECT CAR, MAX(SPEED) AS MAXSPEED, MIN(SPEED) AS MINSPEED, AVG(SPEED) AS AVGSPEED FROM SPEED GROUP BY CAR";
+function getRaceId(db, carname) {
+  var filter = "";
+  if (carname) {
+    filter = util.format(" WHERE CAR = '%s'", carname);
+  }
+  var sql = "SELECT DISTINCT RACE FROM SPEED" + filter;
   return db.exec(sql);
 }
 
-function getLapData(db) {
-  var sql = "SELECT CAR, MIN(LAPTIME) AS FASTESTTIME FROM LAP GROUP BY CAR";
+function getSpeedData(db, carname) {
+  var filter = "";
+  if (carname) {
+    filter = util.format(" WHERE CAR = '%s'", carname);
+  }
+  var sql = "SELECT CAR, MAX(SPEED) AS MAXSPEED, MIN(SPEED) AS MINSPEED, AVG(SPEED) AS AVGSPEED FROM SPEED " + filter + " GROUP BY CAR";
   return db.exec(sql);
 }
 
-function getOfftrackData(db) {
-  var sql = "SELECT TIMESTAMP,CAR,LAP,TRACK FROM OFFTRACK ORDER BY TIMESTAMP,LAP,CAR";
+function getLapData(db, carname) {
+  var filter = "";
+  if (carname) {
+    filter = util.format(" WHERE CAR = '%s'", carname);
+  }
+  var sql = "SELECT CAR, MIN(LAPTIME) AS FASTESTTIME FROM LAP " + filter + " GROUP BY CAR";
+  return db.exec(sql);
+}
+
+function getOfftrackData(db, carname) {
+  var filter = "";
+  if (carname) {
+    filter = util.format(" WHERE CAR = '%s'", carname);
+  }
+  var sql = "SELECT TIMESTAMP,CAR,LAP,TRACK FROM OFFTRACK " + filter + " ORDER BY TIMESTAMP,LAP,CAR";
   return db.exec(sql);
 }
 
@@ -306,10 +328,33 @@ async.series([
         if ( !client) {
           res.status(404).send();
         } else {
+          var raceId       = getRaceId(client.db);
           var speedData    = getSpeedData(client.db);
           var lapData      = getLapData(client.db);
           var offtrackData = getOfftrackData(client.db);
           var data = {
+            race: raceId,
+            speed: speedData,
+            lap: lapData,
+            offtrack: offtrackData
+          };
+          res.status(200).send(data);
+        }
+      });
+      router.get(STATUSBYCAR, function(req, res) {
+        log.verbose("", "Status request");
+        var demozone = req.params.demozone;
+        var carname  = req.params.carname;
+        var client = _.find(clients, { 'demozone': demozone });
+        if ( !client) {
+          res.status(404).send();
+        } else {
+          var raceId       = getRaceId(client.db, carname);
+          var speedData    = getSpeedData(client.db, carname);
+          var lapData      = getLapData(client.db, carname);
+          var offtrackData = getOfftrackData(client.db, carname);
+          var data = {
+            race: raceId,
             speed: speedData,
             lap: lapData,
             offtrack: offtrackData
