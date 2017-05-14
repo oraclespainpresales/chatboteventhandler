@@ -15,6 +15,7 @@ var restify = require('restify')
   , getUsage = require('command-line-usage')
 ;
 
+log.stream = process.stdout;
 log.timestamp = true;
 
 // Main handlers registration - BEGIN
